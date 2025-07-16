@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const inspectionController_1 = require("../controllers/inspectionController");
+const authMiddleware_1 = require("../middlewares/authMiddleware");
+const authorizationMiddleware_1 = require("../middlewares/authorizationMiddleware");
+const router = (0, express_1.Router)();
+router.post('/', authMiddleware_1.authMiddleware, (0, authorizationMiddleware_1.authorize)(['USER', 'ADMIN']), inspectionController_1.inspectionController.createInspection);
+router.get('/', authMiddleware_1.authMiddleware, (0, authorizationMiddleware_1.authorize)(['USER', 'ADMIN']), inspectionController_1.inspectionController.getAllInspections);
+router.get('/:id', authMiddleware_1.authMiddleware, (0, authorizationMiddleware_1.authorize)(['USER', 'ADMIN']), inspectionController_1.inspectionController.getInspectionById);
+router.put('/:id', authMiddleware_1.authMiddleware, (0, authorizationMiddleware_1.authorize)(['USER', 'ADMIN']), inspectionController_1.inspectionController.updateInspection);
+router.delete('/:id', authMiddleware_1.authMiddleware, (0, authorizationMiddleware_1.authorize)(['USER', 'ADMIN']), inspectionController_1.inspectionController.deleteInspection);
+exports.default = router;

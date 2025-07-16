@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mysql_db:
+    image: mysql:8.0
+    container_name: ronda_check_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-92760247} # Usar a senha do .env ou padrão
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-ronda_check} # Usar o nome do banco do .env ou padrão
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    restart: unless-stopped
+
+  api_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ronda_check_api
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    environment:
+      DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD:-92760247}@mysql_db:3306/${MYSQL_DATABASE:-ronda_check}
+      JWT_SECRET: ${JWT_SECRET:-your_jwt_secret_here}
+      PORT: ${PORT:-3000}
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+    volumes:
+      - .:/app # Monta o diretório local para hot-reloading em dev
+      - /app/node_modules # Impede que o node_modules local sobrescreva o do contêiner
+    restart: unless-stopped
+
+volumes:
+  mysql_data: 
