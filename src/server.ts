@@ -14,7 +14,7 @@ const swaggerOptions = {
       description: 'Documentação da API Express + Prisma + MySQL para o sistema Ronda Check',
     },
     servers: [
-      { url: `http://localhost:${PORT}` }
+      { url: "http://rondacheck.com.br" }
     ],
     components: {
       securitySchemes: {
