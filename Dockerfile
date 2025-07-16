@@ -7,15 +7,17 @@ WORKDIR /app
 # Copia os arquivos package.json e pnpm-lock.yaml para o diretório de trabalho
 COPY package.json ./pnpm-lock.yaml* ./
 
-# Instala as dependências usando pnpm
-# Use --frozen-lockfile para garantir que as dependências sejam exatamente como no lockfile
-RUN pnpm install --frozen-lockfile
+# Instala o pnpm globalmente
+RUN npm install -g pnpm
+
+# Instala as dependências usando pnpm (incluindo devDependencies)
+RUN pnpm install --frozen-lockfile --prod=false
 
 # Copia o restante do código da aplicação para o diretório de trabalho
 COPY . .
 
 # Gera o Prisma Client dentro do contêiner
-RUN npx prisma generate
+RUN pnpm prisma generate
 
 # Constrói a aplicação TypeScript
 RUN npm run build
