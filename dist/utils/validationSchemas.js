@@ -31,6 +31,7 @@ exports.registerSchema = zod_1.z.object({
     email: zod_1.z.string().email("Invalid email address"),
     password: zod_1.z.string().min(6, "Password must be at least 6 characters long"),
     name: zod_1.z.string().optional(),
+    role: zod_1.z.enum(['USER', 'ADMIN']).optional(),
 });
 exports.loginSchema = zod_1.z.object({
     email: zod_1.z.string().email("Invalid email address"),

@@ -54,7 +54,6 @@ exports.photoController = {
             if (error instanceof Error && error.message.includes('Record to connect does not exist')) {
                 return res.status(404).json({ message: 'Inspection not found' });
             }
-            console.error('Error adding photo:', error);
             res.status(500).json({ message: 'Internal server error' });
         }
     },
@@ -97,7 +96,6 @@ exports.photoController = {
             res.status(200).json(photos);
         }
         catch (error) {
-            console.error('Error fetching photos by inspection ID:', error);
             res.status(500).json({ message: 'Internal server error' });
         }
     },
@@ -135,17 +133,16 @@ exports.photoController = {
      *         description: Erro interno do servidor.
      */
     deletePhoto: async (req, res) => {
+        const { id } = req.params;
         try {
-            const { id } = req.params;
-            await photoService_1.photoService.deletePhoto(Number(id));
-            res.status(200).json({ message: 'Photo deleted successfully' });
+            const photo = await photoService_1.photoService.deletePhoto(Number(id));
+            if (!photo) {
+                return res.status(404).json({ error: 'Foto não encontrada' });
+            }
+            res.status(200).json({ message: 'Foto deletada com sucesso' });
         }
         catch (error) {
-            if (error instanceof Error && error.message.includes('Record to delete does not exist')) {
-                return res.status(404).json({ message: 'Photo not found' });
-            }
-            console.error('Error deleting photo:', error);
-            res.status(500).json({ message: 'Internal server error' });
+            res.status(500).json({ error: 'Erro ao deletar foto' });
         }
     },
 };

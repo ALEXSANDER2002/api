@@ -38,8 +38,8 @@ exports.authController = {
      */
     register: async (req, res) => {
         try {
-            const { email, password, name } = validationSchemas_1.registerSchema.parse(req.body);
-            const { user, token } = await authService_1.authService.register(email, password, name);
+            const { email, password, name, role } = validationSchemas_1.registerSchema.parse(req.body);
+            const { user, token } = await authService_1.authService.register(email, password, name, role);
             res.status(201).json({ user, token });
         }
         catch (error) {

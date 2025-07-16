@@ -40,12 +40,19 @@ const supertest_1 = __importDefault(require("supertest"));
 const app_1 = __importStar(require("../app"));
 describe('Auth API', () => {
     beforeAll(async () => {
+        await app_1.prisma.photo.deleteMany({});
+        await app_1.prisma.inspection.deleteMany({});
         await app_1.prisma.user.deleteMany({});
     });
     afterEach(async () => {
+        await app_1.prisma.photo.deleteMany({});
+        await app_1.prisma.inspection.deleteMany({});
         await app_1.prisma.user.deleteMany({});
     });
     afterAll(async () => {
+        await app_1.prisma.photo.deleteMany({});
+        await app_1.prisma.inspection.deleteMany({});
+        await app_1.prisma.user.deleteMany({});
         await app_1.prisma.$disconnect();
     });
     it('should register a new user', async () => {
@@ -63,16 +70,21 @@ describe('Auth API', () => {
         expect(res.body.user).not.toHaveProperty('password');
     });
     it('should not register a user with existing email', async () => {
+        const uniqueEmail = `duplicate_${Date.now()}@example.com`;
+        // Cria o usuário antes
         await (0, supertest_1.default)(app_1.default)
             .post('/auth/register')
             .send({
-            email: 'duplicate@example.com',
+            email: uniqueEmail,
+            name: 'Duplicate User',
             password: 'password123',
         });
+        // Tenta registrar novamente
         const res = await (0, supertest_1.default)(app_1.default)
             .post('/auth/register')
             .send({
-            email: 'duplicate@example.com',
+            email: uniqueEmail,
+            name: 'Duplicate User',
             password: 'password456',
         });
         expect(res.statusCode).toEqual(409);

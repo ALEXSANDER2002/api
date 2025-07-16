@@ -39,8 +39,8 @@ exports.userController = {
             if (error instanceof zod_1.ZodError) {
                 return res.status(400).json({ message: 'Validation error', errors: error.issues });
             }
-            if (error instanceof Error && error.message.includes('Unique constraint failed')) {
-                return res.status(409).json({ message: 'User with this email already exists.' });
+            if (error instanceof Error && error.message.includes('User with this email already exists')) {
+                return res.status(409).json({ message: 'User with this email already exists' });
             }
             console.error('Error creating user:', error);
             res.status(500).json({ message: 'Internal server error' });

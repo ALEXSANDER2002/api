@@ -1,7 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.photoService = void 0;
-const app_1 = require("../app");
+const prisma_1 = __importDefault(require("../prisma"));
 exports.photoService = {
     /**
      * Adds a new photo to an inspection.
@@ -10,7 +13,7 @@ exports.photoService = {
      * @returns The created photo object.
      */
     addPhoto: async (inspectionId, url) => {
-        return app_1.prisma.photo.create({
+        return prisma_1.default.photo.create({
             data: {
                 url,
                 inspection: {
@@ -25,18 +28,20 @@ exports.photoService = {
      * @returns An array of photo objects.
      */
     getPhotosByInspectionId: async (inspectionId) => {
-        return app_1.prisma.photo.findMany({
+        return prisma_1.default.photo.findMany({
             where: { inspectionId },
         });
     },
     /**
      * Deletes a photo by its ID.
      * @param id The ID of the photo to delete.
-     * @returns The deleted photo object.
+     * @returns The deleted photo object, or null if not found.
      */
     deletePhoto: async (id) => {
-        return app_1.prisma.photo.delete({
-            where: { id },
-        });
+        const photo = await prisma_1.default.photo.findUnique({ where: { id } });
+        if (!photo)
+            return null;
+        await prisma_1.default.photo.delete({ where: { id } });
+        return photo;
     },
 };

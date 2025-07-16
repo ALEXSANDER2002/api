@@ -40,14 +40,19 @@ const supertest_1 = __importDefault(require("supertest"));
 const app_1 = __importStar(require("../app")); // Importe app como default e prisma nomeado
 describe('User API', () => {
     beforeAll(async () => {
-        // Limpa o banco de dados antes de todos os testes
+        await app_1.prisma.photo.deleteMany({});
+        await app_1.prisma.inspection.deleteMany({});
         await app_1.prisma.user.deleteMany({});
     });
     afterEach(async () => {
-        // Limpa os usuários após cada teste
+        await app_1.prisma.photo.deleteMany({});
+        await app_1.prisma.inspection.deleteMany({});
         await app_1.prisma.user.deleteMany({});
     });
     afterAll(async () => {
+        await app_1.prisma.photo.deleteMany({});
+        await app_1.prisma.inspection.deleteMany({});
+        await app_1.prisma.user.deleteMany({});
         await app_1.prisma.$disconnect();
     });
     it('should create a new user', async () => {
@@ -78,7 +83,7 @@ describe('User API', () => {
             password: 'password123',
         });
         expect(res.statusCode).toEqual(409);
-        expect(res.body.message).toEqual('User with this email already exists.');
+        expect(res.body.message).toEqual('User with this email already exists');
     });
     // Mais testes para GET, PUT, DELETE de usuários seriam adicionados aqui.
 });

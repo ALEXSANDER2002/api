@@ -1,7 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.inspectionService = void 0;
-const app_1 = require("../app");
+const prisma_1 = __importDefault(require("../prisma"));
 exports.inspectionService = {
     /**
      * Creates a new inspection.
@@ -9,7 +12,7 @@ exports.inspectionService = {
      * @returns The created inspection object.
      */
     createInspection: async (data) => {
-        return app_1.prisma.inspection.create({
+        return prisma_1.default.inspection.create({
             data,
         });
     },
@@ -18,7 +21,7 @@ exports.inspectionService = {
      * @returns An array of inspection objects.
      */
     getAllInspections: async () => {
-        return app_1.prisma.inspection.findMany();
+        return prisma_1.default.inspection.findMany();
     },
     /**
      * Retrieves an inspection by its ID.
@@ -26,7 +29,7 @@ exports.inspectionService = {
      * @returns The inspection object, or null if not found.
      */
     getInspectionById: async (id) => {
-        return app_1.prisma.inspection.findUnique({
+        return prisma_1.default.inspection.findUnique({
             where: { id },
             include: { photos: true, user: { select: { id: true, email: true, name: true } } }, // Include related data
         });
@@ -38,7 +41,7 @@ exports.inspectionService = {
      * @returns The updated inspection object.
      */
     updateInspection: async (id, data) => {
-        return app_1.prisma.inspection.update({
+        return prisma_1.default.inspection.update({
             where: { id },
             data,
         });
@@ -50,10 +53,10 @@ exports.inspectionService = {
      */
     deleteInspection: async (id) => {
         // Delete related photos first to avoid foreign key constraints
-        await app_1.prisma.photo.deleteMany({
+        await prisma_1.default.photo.deleteMany({
             where: { inspectionId: id },
         });
-        return app_1.prisma.inspection.delete({
+        return prisma_1.default.inspection.delete({
             where: { id },
         });
     },

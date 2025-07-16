@@ -32,9 +32,12 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authService = void 0;
-const app_1 = require("../app");
+const prisma_1 = __importDefault(require("../prisma"));
 const bcrypt = __importStar(require("bcryptjs"));
 const jwt = __importStar(require("jsonwebtoken"));
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_here'; // Fallback for safety
@@ -49,12 +52,12 @@ exports.authService = {
      * @throws Error if user with email already exists.
      */
     register: async (email, password, name, role) => {
-        const existingUser = await app_1.prisma.user.findUnique({ where: { email } });
+        const existingUser = await prisma_1.default.user.findUnique({ where: { email } });
         if (existingUser) {
             throw new Error('User with this email already exists');
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await app_1.prisma.user.create({
+        const newUser = await prisma_1.default.user.create({
             data: { email, name, password: hashedPassword, role: role || 'USER' }, // Set default role
         });
         const token = jwt.sign({ userId: newUser.id, email: newUser.email, role: newUser.role }, JWT_SECRET, { expiresIn: '1h' });
@@ -70,7 +73,7 @@ exports.authService = {
      * @throws Error if invalid credentials.
      */
     login: async (email, password) => {
-        const user = await app_1.prisma.user.findUnique({ where: { email } });
+        const user = await prisma_1.default.user.findUnique({ where: { email } });
         if (!user || !user.password) {
             throw new Error('Invalid credentials');
         }

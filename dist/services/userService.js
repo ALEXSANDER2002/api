@@ -32,10 +32,13 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userService = void 0;
 const bcrypt = __importStar(require("bcryptjs"));
-const app_1 = require("../app"); // Importe a instância prisma centralizada
+const prisma_1 = __importDefault(require("../prisma"));
 // Removido: const prisma = new PrismaClient();
 exports.userService = {
     /**
@@ -45,11 +48,16 @@ exports.userService = {
      */
     createUser: async (data) => {
         const { email, name, password, role } = data;
+        // Verifica se já existe usuário com o mesmo e-mail
+        const existingUser = await prisma_1.default.user.findUnique({ where: { email } });
+        if (existingUser) {
+            throw new Error('User with this email already exists');
+        }
         let hashedPassword;
         if (password) {
             hashedPassword = await bcrypt.hash(password, 10);
         }
-        return app_1.prisma.user.create({
+        return prisma_1.default.user.create({
             data: { email, name, password: hashedPassword, role },
         });
     },
@@ -58,7 +66,7 @@ exports.userService = {
      * @returns An array of user objects.
      */
     getAllUsers: async () => {
-        return app_1.prisma.user.findMany({
+        return prisma_1.default.user.findMany({
             select: { id: true, email: true, name: true, createdAt: true, role: true }, // Include role
         });
     },
@@ -68,7 +76,7 @@ exports.userService = {
      * @returns The user object, or null if not found.
      */
     getUserById: async (id) => {
-        return app_1.prisma.user.findUnique({
+        return prisma_1.default.user.findUnique({
             where: { id },
             select: { id: true, email: true, name: true, createdAt: true, role: true }, // Include role
         });
@@ -79,7 +87,7 @@ exports.userService = {
      * @returns The user object, or null if not found.
      */
     getUserByEmail: async (email) => {
-        return app_1.prisma.user.findUnique({
+        return prisma_1.default.user.findUnique({
             where: { email },
         });
     },
@@ -93,7 +101,7 @@ exports.userService = {
         if (data.password) {
             data.password = await bcrypt.hash(data.password, 10);
         }
-        return app_1.prisma.user.update({
+        return prisma_1.default.user.update({
             where: { id },
             data,
             select: { id: true, email: true, name: true, createdAt: true, role: true }, // Include role
@@ -105,7 +113,7 @@ exports.userService = {
      * @returns The deleted user object.
      */
     deleteUser: async (id) => {
-        return app_1.prisma.user.delete({
+        return prisma_1.default.user.delete({
             where: { id },
             select: { id: true, email: true, name: true, createdAt: true, role: true }, // Include role
         });

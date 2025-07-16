@@ -40,31 +40,33 @@ const supertest_1 = __importDefault(require("supertest"));
 const app_1 = __importStar(require("../app"));
 describe('Inspection API', () => {
     let authToken;
-    let userId;
-    beforeAll(async () => {
+    beforeEach(async () => {
         await app_1.prisma.photo.deleteMany({});
         await app_1.prisma.inspection.deleteMany({});
         await app_1.prisma.user.deleteMany({});
-        // Register a user and get a token for authenticated requests
-        const registerRes = await (0, supertest_1.default)(app_1.default)
-            .post('/auth/register')
-            .send({
-            email: 'inspectiontest@example.com',
-            name: 'Inspection Test User',
-            password: 'password123',
-        });
-        authToken = registerRes.body.token;
-        userId = registerRes.body.user.id;
     });
     afterEach(async () => {
         await app_1.prisma.photo.deleteMany({});
         await app_1.prisma.inspection.deleteMany({});
+        await app_1.prisma.user.deleteMany({});
     });
     afterAll(async () => {
-        await app_1.prisma.user.deleteMany({}); // Clean up the test user
+        await app_1.prisma.photo.deleteMany({});
+        await app_1.prisma.inspection.deleteMany({});
+        await app_1.prisma.user.deleteMany({});
         await app_1.prisma.$disconnect();
     });
     it('should create a new inspection', async () => {
+        // Cria usuário e obtém token
+        const registerRes = await (0, supertest_1.default)(app_1.default)
+            .post('/auth/register')
+            .send({
+            email: `inspectiontest1_${Date.now()}@example.com`,
+            name: 'Inspection Test User',
+            password: 'password123',
+        });
+        authToken = registerRes.body.token;
+        const userId = registerRes.body.user.id;
         const res = await (0, supertest_1.default)(app_1.default)
             .post('/inspections')
             .set('Authorization', `Bearer ${authToken}`)
@@ -79,19 +81,32 @@ describe('Inspection API', () => {
         expect(res.body.title).toEqual('Equipment Check');
     });
     it('should get all inspections', async () => {
-        await app_1.prisma.inspection.create({
-            data: {
-                title: 'Inspection 1',
-                status: 'completed',
-                userId: userId,
-            },
+        // Cria usuário e obtém token
+        const registerRes = await (0, supertest_1.default)(app_1.default)
+            .post('/auth/register')
+            .send({
+            email: `inspectiontest2_${Date.now()}@example.com`,
+            name: 'Inspection Test User 2',
+            password: 'password123',
         });
-        await app_1.prisma.inspection.create({
-            data: {
-                title: 'Inspection 2',
-                status: 'pending',
-                userId: userId,
-            },
+        authToken = registerRes.body.token;
+        const userId = registerRes.body.user.id;
+        // Cria inspeções via API
+        await (0, supertest_1.default)(app_1.default)
+            .post('/inspections')
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({
+            title: 'Inspection 1',
+            status: 'completed',
+            userId: userId,
+        });
+        await (0, supertest_1.default)(app_1.default)
+            .post('/inspections')
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({
+            title: 'Inspection 2',
+            status: 'pending',
+            userId: userId,
         });
         const res = await (0, supertest_1.default)(app_1.default)
             .get('/inspections')
@@ -101,29 +116,55 @@ describe('Inspection API', () => {
         expect(res.body[0].title).toEqual('Inspection 1');
     });
     it('should get an inspection by ID', async () => {
-        const inspection = await app_1.prisma.inspection.create({
-            data: {
-                title: 'Specific Inspection',
-                status: 'pending',
-                userId: userId,
-            },
+        // Cria usuário e obtém token
+        const registerRes = await (0, supertest_1.default)(app_1.default)
+            .post('/auth/register')
+            .send({
+            email: `inspectiontest3_${Date.now()}@example.com`,
+            name: 'Inspection Test User 3',
+            password: 'password123',
         });
+        authToken = registerRes.body.token;
+        const userId = registerRes.body.user.id;
+        // Cria inspeção via API
+        const inspectionRes = await (0, supertest_1.default)(app_1.default)
+            .post('/inspections')
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({
+            title: 'Specific Inspection',
+            status: 'pending',
+            userId: userId,
+        });
+        const inspectionId = inspectionRes.body.id;
         const res = await (0, supertest_1.default)(app_1.default)
-            .get(`/inspections/${inspection.id}`)
+            .get(`/inspections/${inspectionId}`)
             .set('Authorization', `Bearer ${authToken}`);
         expect(res.statusCode).toEqual(200);
         expect(res.body.title).toEqual('Specific Inspection');
     });
     it('should update an inspection', async () => {
-        const inspection = await app_1.prisma.inspection.create({
-            data: {
-                title: 'Old Title',
-                status: 'pending',
-                userId: userId,
-            },
+        // Cria usuário e obtém token
+        const registerRes = await (0, supertest_1.default)(app_1.default)
+            .post('/auth/register')
+            .send({
+            email: `inspectiontest4_${Date.now()}@example.com`,
+            name: 'Inspection Test User 4',
+            password: 'password123',
         });
+        authToken = registerRes.body.token;
+        const userId = registerRes.body.user.id;
+        // Cria inspeção via API
+        const inspectionRes = await (0, supertest_1.default)(app_1.default)
+            .post('/inspections')
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({
+            title: 'Old Title',
+            status: 'pending',
+            userId: userId,
+        });
+        const inspectionId = inspectionRes.body.id;
         const res = await (0, supertest_1.default)(app_1.default)
-            .put(`/inspections/${inspection.id}`)
+            .put(`/inspections/${inspectionId}`)
             .set('Authorization', `Bearer ${authToken}`)
             .send({
             title: 'Updated Title',
@@ -134,19 +175,32 @@ describe('Inspection API', () => {
         expect(res.body.status).toEqual('completed');
     });
     it('should delete an inspection', async () => {
-        const inspection = await app_1.prisma.inspection.create({
-            data: {
-                title: 'Inspection to Delete',
-                status: 'pending',
-                userId: userId,
-            },
+        // Cria usuário e obtém token
+        const registerRes = await (0, supertest_1.default)(app_1.default)
+            .post('/auth/register')
+            .send({
+            email: `inspectiontest5_${Date.now()}@example.com`,
+            name: 'Inspection Test User 5',
+            password: 'password123',
         });
+        authToken = registerRes.body.token;
+        const userId = registerRes.body.user.id;
+        // Cria inspeção via API
+        const inspectionRes = await (0, supertest_1.default)(app_1.default)
+            .post('/inspections')
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({
+            title: 'Inspection to Delete',
+            status: 'pending',
+            userId: userId,
+        });
+        const inspectionId = inspectionRes.body.id;
         const res = await (0, supertest_1.default)(app_1.default)
-            .delete(`/inspections/${inspection.id}`)
+            .delete(`/inspections/${inspectionId}`)
             .set('Authorization', `Bearer ${authToken}`);
         expect(res.statusCode).toEqual(200);
         expect(res.body.message).toEqual('Inspection deleted successfully');
-        const deletedInspection = await app_1.prisma.inspection.findUnique({ where: { id: inspection.id } });
+        const deletedInspection = await app_1.prisma.inspection.findUnique({ where: { id: inspectionId } });
         expect(deletedInspection).toBeNull();
     });
     it('should not create an inspection without authentication', async () => {
@@ -155,7 +209,7 @@ describe('Inspection API', () => {
             .send({
             title: 'Unauthorized Inspection',
             status: 'pending',
-            userId: userId,
+            userId: 1, // Assuming a default user ID for this test
         });
         expect(res.statusCode).toEqual(401);
         expect(res.body.message).toEqual('No token provided');

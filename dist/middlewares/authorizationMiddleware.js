@@ -8,6 +8,7 @@ const authorize = (allowedRoles) => {
         if (!userRole || !allowedRoles.includes(userRole)) {
             return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
         }
+        console.log('AUTHZ LOG req.userRole:', req.userRole, 'req.userId:', req.userId);
         next();
     };
 };
