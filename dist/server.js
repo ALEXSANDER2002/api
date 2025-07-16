@@ -262,7 +262,12 @@ const swaggerOptions = {
                 bearerAuth: [],
             }],
     },
-    apis: ['./src/routes/*.ts', './src/controllers/*.ts'],
+    apis: [
+        './src/routes/*.ts',
+        './src/controllers/*.ts',
+        './dist/routes/*.js',
+        './dist/controllers/*.js'
+    ],
 };
 const swaggerSpec = (0, swagger_jsdoc_1.default)(swaggerOptions);
 app_1.default.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerSpec));
