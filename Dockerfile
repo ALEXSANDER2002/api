@@ -22,8 +22,15 @@ RUN pnpm prisma generate
 # Constrói a aplicação TypeScript
 RUN npm run build
 
+# Copia o script de seed
+COPY prisma/seed.ts ./prisma/
+
+# Copia e torna executável o script de inicialização
+COPY scripts/start.sh ./
+RUN chmod +x start.sh
+
 # Expõe a porta em que a aplicação será executada
 EXPOSE 3000
 
 # Define o comando para iniciar a aplicação em produção
-CMD ["npm", "start"] 
+CMD ["./start.sh"] 
