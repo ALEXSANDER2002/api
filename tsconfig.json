@@ -11,5 +11,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "types": ["node", "jest"]
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "prisma", "**/*.test.ts", "**/*.spec.ts"]
 } 
