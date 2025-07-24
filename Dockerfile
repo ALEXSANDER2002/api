@@ -29,4 +29,4 @@ RUN chmod +x scripts/start.sh
 EXPOSE 3000
 
 # Define o comando para iniciar a aplicação em produção
-CMD ["./scripts/start.sh"] 
+CMD ["sh", "./scripts/start.sh"] 
