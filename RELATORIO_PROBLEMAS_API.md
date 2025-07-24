@@ -215,3 +215,56 @@ Estou disponível para:
 ---
 
 *Este relatório foi gerado automaticamente com base nos testes de integração realizados em 23/01/2025* 
+
+## 🧪 Testes dos Endpoints
+
+No servidor (`root@srv858770:~/api`), execute:
+
+### 1. Health Check
+```bash
+curl -X GET http://localhost:3001/health
+```
+
+### 2. Sincronização Mobile (deve funcionar)
+```bash
+<code_block_to_apply_changes_from>
+```
+
+### 3. Sincronização Web (deve dar erro)
+```bash
+curl -X POST http://localhost:3001/sync \
+  -H "Content-Type: application/json" \
+  -d '{"users": [], "inspections": [], "photos": []}'
+```
+
+### 4. Login Admin (pode dar erro se o seed não funcionou)
+```bash
+curl -X POST http://localhost:3001/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@rondacheck.com.br",
+    "password": "admin123"
+  }'
+```
+
+## 🔍 Se o seed não funcionou, vamos criar o usuário manualmente:
+
+```bash
+# Entrar no container
+docker exec -it ronda_check_api sh
+
+# Executar o seed manualmente
+npx ts-node prisma/seed.ts
+
+# Sair do container
+exit
+```
+
+## 📊 Resultados Esperados:
+
+- ✅ **Health Check**: Deve retornar JSON com status "OK"
+- ✅ **Sincronização Mobile**: Deve retornar dados sincronizados
+- ❌ **Sincronização Web**: Deve dar erro de autenticação
+- ✅ **Login Admin**: Deve retornar token JWT
+
+Execute os testes e me informe os resultados! 🚀 
