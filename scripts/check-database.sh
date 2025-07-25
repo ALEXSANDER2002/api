@@ -14,8 +14,8 @@ log() {
     echo -e "${GREEN}[$(date +'%H:%M:%S')] $1${NC}"
 }
 
-# Usar a senha correta do MySQL
-MYSQL_PASSWORD="ronda_check_password"
+# Usar a senha correta do MySQL (do docker-compose.yml)
+MYSQL_PASSWORD="92760247"
 
 # 1. Verificar usuários
 log "1. Verificando usuários no banco..."
