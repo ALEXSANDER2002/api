@@ -53,29 +53,61 @@ export const loginSchema = z.object({
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 
+// Schema mais flexível para sincronização mobile
 export const syncPayloadSchema = z.object({
   users: z.array(z.object({
     id: z.number().int().optional(),
-    email: z.string().email(),
-    name: z.string().nullable().optional(), // Alterado para permitir null
-    password: z.string().nullable().optional(), // Alterado para permitir null
-    createdAt: z.string().datetime().nullable().optional(), // Alterado para permitir null
-  })).optional(),
+    email: z.string().email().optional(), // Email opcional para mobile
+    name: z.string().nullable().optional(),
+    password: z.string().nullable().optional(),
+    createdAt: z.string().datetime().nullable().optional(),
+    updatedAt: z.string().datetime().nullable().optional(),
+    // Campos adicionais que podem vir do mobile
+    inspectionType: z.string().optional(),
+    inspectorName: z.string().optional(),
+    location: z.string().optional(),
+    notes: z.string().nullable().optional(),
+    isDeleted: z.boolean().optional(),
+    isSynced: z.boolean().optional(),
+    syncedAt: z.string().datetime().nullable().optional(),
+    serverId: z.number().int().nullable().optional(),
+  })).optional().default([]),
   inspections: z.array(z.object({
     id: z.number().int().optional(),
-    title: z.string(),
-    description: z.string().nullable().optional(), // Alterado para permitir null
-    status: z.enum(['pending', 'completed', 'synced']),
-    userId: z.number().int(),
-    createdAt: z.string().datetime().nullable().optional(), // Alterado para permitir null
-    updatedAt: z.string().datetime().nullable().optional(), // Alterado para permitir null
-  })).optional(),
+    title: z.string().optional(), // Título opcional
+    description: z.string().nullable().optional(),
+    status: z.enum(['pending', 'completed', 'synced']).optional(), // Status opcional
+    userId: z.number().int().optional(), // UserId opcional
+    createdAt: z.string().datetime().nullable().optional(),
+    updatedAt: z.string().datetime().nullable().optional(),
+    // Campos adicionais que podem vir do mobile
+    inspectionType: z.string().optional(),
+    inspectorName: z.string().optional(),
+    location: z.string().optional(),
+    notes: z.string().nullable().optional(),
+    isDeleted: z.boolean().optional(),
+    isSynced: z.boolean().optional(),
+    syncedAt: z.string().datetime().nullable().optional(),
+    serverId: z.number().int().nullable().optional(),
+    inspectionDate: z.string().datetime().nullable().optional(),
+  })).optional().default([]),
   photos: z.array(z.object({
     id: z.number().int().optional(),
-    url: z.string().url(),
-    inspectionId: z.number().int(),
-    createdAt: z.string().datetime().nullable().optional(), // Alterado para permitir null
-  })).optional(),
+    url: z.string().url().optional(), // URL opcional
+    inspectionId: z.number().int().optional(), // InspectionId opcional
+    createdAt: z.string().datetime().nullable().optional(),
+    updatedAt: z.string().datetime().nullable().optional(),
+  })).optional().default([]),
+  // Campo adicional para checklist items
+  checklistItems: z.array(z.object({
+    id: z.number().int().optional(),
+    inspectionId: z.number().int().optional(),
+    title: z.string().optional(),
+    status: z.string().optional(),
+    notes: z.string().nullable().optional(),
+    createdAt: z.string().datetime().nullable().optional(),
+    updatedAt: z.string().datetime().nullable().optional(),
+  })).optional().default([]),
 });
 
 export type SyncPayloadInput = z.infer<typeof syncPayloadSchema>; 
