@@ -23,11 +23,11 @@ services:
       dockerfile: Dockerfile
     container_name: ronda_check_api
     ports:
-      - "${PORT:-3000}:${PORT:-3000}"
+      - "3000:3000"  # Mapeamento fixo para porta 3000
     environment:
       DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD:-92760247}@mysql_db:3306/${MYSQL_DATABASE:-ronda_check}
       JWT_SECRET: ${JWT_SECRET:-your_jwt_secret_here}
-      PORT: ${PORT:-3000}
+      PORT: 3000  # Porta fixa dentro do container
     depends_on:
       mysql_db:
         condition: service_healthy
