@@ -6,7 +6,7 @@ import { createInspectionSchema, updateInspectionSchema } from '../utils/validat
 export const inspectionController = {
   /**
    * @swagger
-   * /inspections/public:
+   * /public/inspections:
    *   get:
    *     summary: Lista todas as inspeções (rota pública - sem autenticação)
    *     tags: [Inspections]

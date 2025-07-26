@@ -5,7 +5,7 @@ import { authorize } from '../middlewares/authorizationMiddleware';
 
 const router = Router();
 
-// Rotas públicas (sem autenticação)
+// Rotas públicas (sem autenticação) - DEVEM vir ANTES das rotas com parâmetros
 router.get('/public', inspectionController.getAllInspectionsPublic); // Rota pública para listar inspeções
 
 // Rotas protegidas (com autenticação)

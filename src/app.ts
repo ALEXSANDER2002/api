@@ -8,6 +8,7 @@ import userRoutes from './routes/userRoutes';
 import inspectionRoutes from './routes/inspectionRoutes';
 import photoRoutes from './routes/photoRoutes';
 import syncRoutes from './routes/syncRoutes';
+import publicRoutes from './routes/publicRoutes';
 import { errorHandler } from './middlewares/errorHandler';
 
 const app = express();
@@ -84,7 +85,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// Routes
+// Routes públicas (sem autenticação)
+app.use('/public', publicRoutes);
+
+// Routes protegidas (com autenticação)
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/photos', photoRoutes);
