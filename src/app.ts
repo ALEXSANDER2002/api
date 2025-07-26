@@ -76,29 +76,7 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' })); // Aumentar limite para upload de fotos
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Middleware de log para debug do CORS
-app.use((req: Request, res: Response, next: NextFunction) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  console.log('Origin:', req.headers.origin);
-  console.log('User-Agent:', req.headers['user-agent']);
-  console.log('X-Client-Type:', req.headers['x-client-type']);
-  next();
-});
-
-// Routes públicas (sem autenticação)
-app.use('/public', publicRoutes);
-
-// Routes protegidas (com autenticação)
-app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
-app.use('/photos', photoRoutes);
-app.use('/inspections', inspectionRoutes);
-app.use('/sync', syncRoutes);
-
-// Error handling middleware
-app.use(errorHandler);
-
-// Health Check endpoint
+// Health Check endpoint (ANTES das rotas)
 app.get('/health', async (req: Request, res: Response) => {
   try {
     // Testa conexão com banco
@@ -120,10 +98,32 @@ app.get('/health', async (req: Request, res: Response) => {
   }
 });
 
-// Test Route
+// Test Route (ANTES das rotas)
 app.get('/', (req: Request, res: Response) => {
   res.send('API is running!');
 });
+
+// Middleware de log para debug do CORS
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  console.log('Origin:', req.headers.origin);
+  console.log('User-Agent:', req.headers['user-agent']);
+  console.log('X-Client-Type:', req.headers['x-client-type']);
+  next();
+});
+
+// Routes públicas (sem autenticação)
+app.use('/public', publicRoutes);
+
+// Routes protegidas (com autenticação)
+app.use('/auth', authRoutes);
+app.use('/users', userRoutes);
+app.use('/photos', photoRoutes);
+app.use('/inspections', inspectionRoutes);
+app.use('/sync', syncRoutes);
+
+// Error handling middleware
+app.use(errorHandler);
 
 // Export PrismaClient for use in services
 export { prisma };
