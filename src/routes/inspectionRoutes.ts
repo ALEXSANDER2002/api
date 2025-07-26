@@ -1,18 +1,14 @@
 import { Router } from 'express';
 import { inspectionController } from '../controllers/inspectionController';
-import { authMiddleware } from '../middlewares/authMiddleware';
-import { authorize } from '../middlewares/authorizationMiddleware';
 
 const router = Router();
 
-// Rotas públicas (sem autenticação) - DEVEM vir ANTES das rotas com parâmetros
-router.get('/public', inspectionController.getAllInspectionsPublic); // Rota pública para listar inspeções
-
-// Rotas protegidas (com autenticação)
-router.post('/', authMiddleware, authorize(['USER', 'ADMIN']), inspectionController.createInspection);
-router.get('/', authMiddleware, authorize(['USER', 'ADMIN']), inspectionController.getAllInspections);
-router.get('/:id', authMiddleware, authorize(['USER', 'ADMIN']), inspectionController.getInspectionById);
-router.put('/:id', authMiddleware, authorize(['USER', 'ADMIN']), inspectionController.updateInspection);
-router.delete('/:id', authMiddleware, authorize(['USER', 'ADMIN']), inspectionController.deleteInspection);
+// TODAS AS ROTAS LIBERADAS - SEM AUTENTICAÇÃO
+router.post('/', inspectionController.createInspection);
+router.get('/', inspectionController.getAllInspections);
+router.get('/public', inspectionController.getAllInspectionsPublic);
+router.get('/:id', inspectionController.getInspectionById);
+router.put('/:id', inspectionController.updateInspection);
+router.delete('/:id', inspectionController.deleteInspection);
 
 export default router; 
