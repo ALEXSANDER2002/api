@@ -6,6 +6,35 @@ import { createInspectionSchema, updateInspectionSchema } from '../utils/validat
 export const inspectionController = {
   /**
    * @swagger
+   * /inspections/public:
+   *   get:
+   *     summary: Lista todas as inspeções (rota pública - sem autenticação)
+   *     tags: [Inspections]
+   *     security: []  // Rota pública
+   *     responses:
+   *       200:
+   *         description: Lista de inspeções.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 $ref: '#/components/schemas/Inspection'
+   *       500:
+   *         description: Erro interno do servidor.
+   */
+  getAllInspectionsPublic: async (req: Request, res: Response) => {
+    try {
+      const inspections = await inspectionService.getAllInspections();
+      res.status(200).json(inspections);
+    } catch (error) {
+      console.error('Error fetching inspections:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  },
+
+  /**
+   * @swagger
    * /inspections:
    *   post:
    *     summary: Cria uma nova inspeção
