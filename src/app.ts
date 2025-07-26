@@ -26,7 +26,11 @@ const corsOptions = {
     'Authorization',
     'X-Client-Type',
     'Cache-Control',
-    'Pragma'
+    'Pragma',
+    'If-Modified-Since',
+    'If-None-Match',
+    'ETag',
+    'Last-Modified'
   ],
   exposedHeaders: ['Content-Length', 'X-Requested-With'],
   maxAge: 86400 // Cache preflight por 24 horas
