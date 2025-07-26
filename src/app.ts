@@ -15,7 +15,7 @@ const app = express();
 
 // Configuração do CORS - LIBERADO PARA TODAS AS ORIGENS
 const corsOptions = {
-  origin: '*', // ✅ Aceita qualquer origem
+  origin: true, // ✅ Aceita qualquer origem (mais compatível)
   credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: [
