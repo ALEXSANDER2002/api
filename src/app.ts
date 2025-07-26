@@ -13,7 +13,7 @@ import { errorHandler } from './middlewares/errorHandler';
 
 const app = express();
 
-// Configuração do CORS
+// Configuração do CORS - CORRIGIDA para evitar múltiplos valores
 const corsOptions = {
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     // Lista de origens permitidas
@@ -55,7 +55,7 @@ const corsOptions = {
     // Para produção, rejeitar origens não autorizadas
     callback(new Error('Not allowed by CORS'));
   },
-  credentials: true, // Permitir cookies e headers de autenticação
+  credentials: false, // Mudado para false para evitar problemas de CORS
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: [
     'Origin',
@@ -63,7 +63,7 @@ const corsOptions = {
     'Content-Type',
     'Accept',
     'Authorization',
-    'X-Client-Type', // Header específico para o endpoint de sync
+    'X-Client-Type',
     'Cache-Control',
     'Pragma'
   ],
