@@ -11,7 +11,7 @@ export const syncController = {
    *   post:
    *     summary: Sincroniza dados do aplicativo móvel para o backend
    *     tags: [Sync]
-   *     security: []  // Removido - endpoint público para mobile
+   *     security: []
    *     requestBody:
    *       required: true
    *       content:
@@ -52,7 +52,7 @@ export const syncController = {
    *   get:
    *     summary: Sincroniza usuários do banco de dados para o backend
    *     tags: [Sync]
-   *     security: []  // Removido - endpoint público para mobile
+   *     security: []
    *     responses:
    *       200:
    *         description: Usuários sincronizados com sucesso.
