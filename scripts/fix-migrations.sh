@@ -25,11 +25,20 @@ error() {
 # 1. Verificar se o banco tem dados
 log "1. Verificando se o banco tem dados..."
 echo "docker compose exec mysql_db mysql -u root -p'92760247' -e \"USE ronda_check; SHOW TABLES;\""
-docker compose exec mysql_db mysql -u root -p'92760247' -e "USE ronda_check; SHOW TABLES;"
+TABLES=$(docker compose exec mysql_db mysql -u root -p'92760247' -e "USE ronda_check; SHOW TABLES;" 2>/dev/null | grep -v "Tables_in_ronda_check" | grep -v "^$" | wc -l)
 echo ""
 
-# 2. Se não tem tabelas, executar migrações normalmente
-if ! docker compose exec mysql_db mysql -u root -p'92760247' -e "USE ronda_check; SHOW TABLES;" 2>/dev/null | grep -q "users"; then
+# 2. Se tem tabelas, marcar migrações como aplicadas
+if [[ $TABLES -gt 0 ]]; then
+    log "2. Banco tem $TABLES tabelas - marcando migrações como aplicadas..."
+    echo "docker compose exec api_service npx prisma migrate resolve --applied 20250715162330_init"
+    docker compose exec api_service npx prisma migrate resolve --applied 20250715162330_init
+    echo "docker compose exec api_service npx prisma migrate resolve --applied 20250715162645_add_password_to_user"
+    docker compose exec api_service npx prisma migrate resolve --applied 20250715162645_add_password_to_user
+    echo "docker compose exec api_service npx prisma migrate resolve --applied 20250715165658_add_user_role"
+    docker compose exec api_service npx prisma migrate resolve --applied 20250715165658_add_user_role
+    success "Migrações marcadas como aplicadas"
+else
     log "2. Banco vazio - executando migrações..."
     docker compose exec api_service npx prisma migrate deploy
     if [[ $? -eq 0 ]]; then
@@ -38,15 +47,6 @@ if ! docker compose exec mysql_db mysql -u root -p'92760247' -e "USE ronda_check
         error "Erro ao executar migrações"
         exit 1
     fi
-else
-    log "2. Banco tem dados - marcando migrações como aplicadas..."
-    echo "docker compose exec api_service npx prisma migrate resolve --applied 20250715162330_init"
-    docker compose exec api_service npx prisma migrate resolve --applied 20250715162330_init
-    echo "docker compose exec api_service npx prisma migrate resolve --applied 20250715162645_add_password_to_user"
-    docker compose exec api_service npx prisma migrate resolve --applied 20250715162645_add_password_to_user
-    echo "docker compose exec api_service npx prisma migrate resolve --applied 20250715165658_add_user_role"
-    docker compose exec api_service npx prisma migrate resolve --applied 20250715165658_add_user_role
-    success "Migrações marcadas como aplicadas"
 fi
 echo ""
 
@@ -69,12 +69,12 @@ echo ""
 
 # 5. Verificar dados existentes
 log "5. Verificando dados existentes..."
-echo "docker compose exec mysql_db mysql -u root -p'92760247' -e \"USE ronda_check; SELECT COUNT(*) as total_users FROM users;\""
-docker compose exec mysql_db mysql -u root -p'92760247' -e "USE ronda_check; SELECT COUNT(*) as total_users FROM users;"
+echo "docker compose exec mysql_db mysql -u root -p'92760247' -e \"USE ronda_check; SELECT COUNT(*) as total_users FROM User;\""
+docker compose exec mysql_db mysql -u root -p'92760247' -e "USE ronda_check; SELECT COUNT(*) as total_users FROM User;"
 echo ""
 
-echo "docker compose exec mysql_db mysql -u root -p'92760247' -e \"USE ronda_check; SELECT COUNT(*) as total_inspections FROM inspections;\""
-docker compose exec mysql_db mysql -u root -p'92760247' -e "USE ronda_check; SELECT COUNT(*) as total_inspections FROM inspections;"
+echo "docker compose exec mysql_db mysql -u root -p'92760247' -e \"USE ronda_check; SELECT COUNT(*) as total_inspections FROM Inspection;\""
+docker compose exec mysql_db mysql -u root -p'92760247' -e "USE ronda_check; SELECT COUNT(*) as total_inspections FROM Inspection;"
 echo ""
 
 # 6. Testar sincronização
