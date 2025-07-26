@@ -11,7 +11,7 @@ COPY package.json ./pnpm-lock.yaml* ./
 RUN npm install -g pnpm
 
 # Instala as dependências usando pnpm (incluindo devDependencies)
-RUN pnpm install --frozen-lockfile --prod=false
+RUN pnpm install --no-frozen-lockfile --prod=false
 
 # Copia o restante do código da aplicação para o diretório de trabalho
 COPY . .
