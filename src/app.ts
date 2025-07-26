@@ -13,49 +13,10 @@ import { errorHandler } from './middlewares/errorHandler';
 
 const app = express();
 
-// Configuração do CORS - CORRIGIDA para evitar múltiplos valores
+// Configuração do CORS - SIMPLIFICADA para evitar múltiplos valores
 const corsOptions = {
-  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-    // Lista de origens permitidas
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:3001', 
-      'http://localhost:8080',
-      'http://localhost:5173',
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:3001',
-      'http://127.0.0.1:8080',
-      'http://127.0.0.1:5173',
-      'https://rondacheck.com.br',
-      'https://www.rondacheck.com.br',
-      // Para desenvolvimento mobile (React Native, Expo, etc.)
-      'exp://localhost:19000',
-      'exp://192.168.1.100:19000',
-      'exp://10.0.2.2:19000',
-      // Para apps mobile que fazem requisições diretas
-      'capacitor://localhost',
-      'ionic://localhost'
-    ];
-
-    // Permitir requisições sem origin (como apps mobile ou Postman)
-    if (!origin) {
-      return callback(null, true);
-    }
-
-    // Verificar se a origem está na lista de permitidas
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      return callback(null, true);
-    }
-
-    // Para desenvolvimento, permitir todas as origens
-    if (process.env.NODE_ENV === 'development') {
-      return callback(null, true);
-    }
-
-    // Para produção, rejeitar origens não autorizadas
-    callback(new Error('Not allowed by CORS'));
-  },
-  credentials: false, // Mudado para false para evitar problemas de CORS
+  origin: 'http://localhost:3001', // Apenas uma origem específica
+  credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: [
     'Origin',
