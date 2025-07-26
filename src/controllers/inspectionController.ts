@@ -10,7 +10,7 @@ export const inspectionController = {
    *   get:
    *     summary: Lista todas as inspeções (rota pública - sem autenticação)
    *     tags: [Inspections]
-   *     security: []  // Rota pública
+   *     security: []
    *     responses:
    *       200:
    *         description: Lista de inspeções.
