@@ -15,8 +15,7 @@ exports.syncController = {
      *   post:
      *     summary: Sincroniza dados do aplicativo móvel para o backend
      *     tags: [Sync]
-     *     security:
-     *       - bearerAuth: []
+     *     security: []
      *     requestBody:
      *       required: true
      *       content:
@@ -57,8 +56,7 @@ exports.syncController = {
      *   get:
      *     summary: Sincroniza usuários do banco de dados para o backend
      *     tags: [Sync]
-     *     security:
-     *       - bearerAuth: []
+     *     security: []
      *     responses:
      *       200:
      *         description: Usuários sincronizados com sucesso.

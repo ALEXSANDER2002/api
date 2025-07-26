@@ -7,6 +7,35 @@ const validationSchemas_1 = require("../utils/validationSchemas");
 exports.inspectionController = {
     /**
      * @swagger
+     * /public/inspections:
+     *   get:
+     *     summary: Lista todas as inspeções (rota pública - sem autenticação)
+     *     tags: [Inspections]
+     *     security: []
+     *     responses:
+     *       200:
+     *         description: Lista de inspeções.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/Inspection'
+     *       500:
+     *         description: Erro interno do servidor.
+     */
+    getAllInspectionsPublic: async (req, res) => {
+        try {
+            const inspections = await inspectionService_1.inspectionService.getAllInspections();
+            res.status(200).json(inspections);
+        }
+        catch (error) {
+            console.error('Error fetching inspections:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+    /**
+     * @swagger
      * /inspections:
      *   post:
      *     summary: Cria uma nova inspeção

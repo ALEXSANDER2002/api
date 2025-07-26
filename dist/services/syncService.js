@@ -15,15 +15,21 @@ async function processUsers(users) {
     const existingEmailsInDb = new Map(existingUsersInDb.map(u => [u.email, u.id]));
     for (const appUser of users || []) {
         try {
-            if (appUser.email && processedEmails.has(appUser.email)) {
+            // Se não tem email, pular
+            if (!appUser.email) {
+                conflicts.push({ type: 'user', data: appUser, error: 'Email é obrigatório para usuários' });
+                continue;
+            }
+            if (processedEmails.has(appUser.email)) {
                 conflicts.push({ type: 'user', data: appUser, error: 'User with this email already exists in this sync batch' });
                 continue;
             }
-            const dbId = appUser.email ? existingEmailsInDb.get(appUser.email) : undefined;
+            const dbId = existingEmailsInDb.get(appUser.email);
             if (!dbId && !appUser.id) {
+                // Criar novo usuário
                 const userDataToProcess = {
                     email: appUser.email,
-                    name: appUser.name,
+                    name: appUser.name || 'Usuário Mobile',
                     password: appUser.password ? await bcryptjs_1.default.hash(appUser.password, 10) : undefined,
                 };
                 const newUser = await prisma_1.default.user.create({ data: userDataToProcess });
@@ -32,6 +38,7 @@ async function processUsers(users) {
                 continue;
             }
             if (dbId && appUser.id && dbId === appUser.id) {
+                // Atualizar usuário existente
                 const userDataToProcess = {
                     email: appUser.email,
                     name: appUser.name,
@@ -47,9 +54,10 @@ async function processUsers(users) {
                 continue;
             }
             if (!dbId && appUser.id) {
+                // Criar usuário com ID específico (se possível)
                 const userDataToProcess = {
                     email: appUser.email,
-                    name: appUser.name,
+                    name: appUser.name || 'Usuário Mobile',
                     password: appUser.password ? await bcryptjs_1.default.hash(appUser.password, 10) : undefined,
                 };
                 const newUser = await prisma_1.default.user.create({ data: userDataToProcess });
@@ -70,6 +78,15 @@ async function processInspections(inspections) {
     const conflicts = [];
     for (const appInspection of inspections || []) {
         try {
+            // Validar campos obrigatórios
+            if (!appInspection.title) {
+                conflicts.push({ type: 'inspection', data: appInspection, error: 'Title is required' });
+                continue;
+            }
+            if (!appInspection.userId) {
+                conflicts.push({ type: 'inspection', data: appInspection, error: 'UserId is required' });
+                continue;
+            }
             let existingInspection = null;
             let updateWhere = undefined;
             if (appInspection.id !== undefined && appInspection.id !== null) {
@@ -78,7 +95,7 @@ async function processInspections(inspections) {
             }
             const inspectionDataToProcess = {
                 title: appInspection.title,
-                status: appInspection.status,
+                status: appInspection.status || 'completed',
                 user: { connect: { id: appInspection.userId } },
             };
             if (appInspection.description !== undefined) {
@@ -110,6 +127,15 @@ async function processPhotos(photos) {
     const conflicts = [];
     for (const appPhoto of photos || []) {
         try {
+            // Validar campos obrigatórios
+            if (!appPhoto.url) {
+                conflicts.push({ type: 'photo', data: appPhoto, error: 'URL is required' });
+                continue;
+            }
+            if (!appPhoto.inspectionId) {
+                conflicts.push({ type: 'photo', data: appPhoto, error: 'InspectionId is required' });
+                continue;
+            }
             let existingPhoto = null;
             let updateWhere = undefined;
             if (appPhoto.id !== undefined && appPhoto.id !== null) {
@@ -149,6 +175,16 @@ async function processPhotos(photos) {
     }
     return { syncedPhotos, conflicts };
 }
+// Função auxiliar para processar checklist items (se existir tabela)
+async function processChecklistItems(checklistItems) {
+    const conflicts = [];
+    // Por enquanto, apenas log dos items (não há tabela no schema)
+    for (const item of checklistItems || []) {
+        console.log('📝 Checklist item recebido:', item);
+        // TODO: Implementar quando houver tabela de checklist items
+    }
+    return { conflicts };
+}
 exports.syncService = {
     /**
      * Synchronizes data from the mobile app to the backend.
@@ -156,12 +192,19 @@ exports.syncService = {
      * @returns A result object detailing synchronized data and any conflicts.
      */
     syncData: async (payload) => {
-        const [userResult, inspectionResult, photoResult] = await Promise.all([
+        console.log('🔄 Iniciando sincronização com payload:', {
+            users: payload.users?.length || 0,
+            inspections: payload.inspections?.length || 0,
+            photos: payload.photos?.length || 0,
+            checklistItems: payload.checklistItems?.length || 0,
+        });
+        const [userResult, inspectionResult, photoResult, checklistResult] = await Promise.all([
             processUsers(payload.users),
             processInspections(payload.inspections),
             processPhotos(payload.photos),
+            processChecklistItems(payload.checklistItems),
         ]);
-        return {
+        const result = {
             syncedUsers: userResult.syncedUsers,
             syncedInspections: inspectionResult.syncedInspections,
             syncedPhotos: photoResult.syncedPhotos,
@@ -169,7 +212,15 @@ exports.syncService = {
                 ...userResult.conflicts,
                 ...inspectionResult.conflicts,
                 ...photoResult.conflicts,
+                ...checklistResult.conflicts,
             ],
         };
+        console.log('✅ Sincronização concluída:', {
+            syncedUsers: result.syncedUsers.length,
+            syncedInspections: result.syncedInspections.length,
+            syncedPhotos: result.syncedPhotos.length,
+            conflicts: result.conflicts.length,
+        });
+        return result;
     },
 };
