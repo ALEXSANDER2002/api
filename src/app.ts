@@ -13,9 +13,9 @@ import { errorHandler } from './middlewares/errorHandler';
 
 const app = express();
 
-// Configuração do CORS - SIMPLIFICADA para evitar múltiplos valores
+// Configuração do CORS - LIBERADO PARA TODAS AS ORIGENS
 const corsOptions = {
-  origin: 'http://localhost:3001', // Apenas uma origem específica
+  origin: '*', // ✅ Aceita qualquer origem
   credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: [
