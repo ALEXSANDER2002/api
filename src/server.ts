@@ -255,9 +255,10 @@ const swaggerOptions = {
         },
       },
     },
-    security: [{
-      bearerAuth: [],
-    }],
+    // Removido security obrigatório para permitir acesso sem token
+    // security: [{
+    //   bearerAuth: [],
+    // }],
   },
   apis: [
     './src/routes/*.ts',
