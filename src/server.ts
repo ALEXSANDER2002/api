@@ -4,6 +4,27 @@ import swaggerJsdoc from 'swagger-jsdoc';
 
 const PORT = process.env.PORT || 3000;
 
+// Health Check endpoint (ANTES do Swagger)
+app.get('/health', async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({
+      status: 'OK',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      database: 'connected',
+      version: '1.0.0'
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'ERROR',
+      timestamp: new Date().toISOString(),
+      database: 'disconnected',
+      error: 'Database connection failed'
+    });
+  }
+});
+
 // Swagger Configuration
 const swaggerOptions = {
   definition: {

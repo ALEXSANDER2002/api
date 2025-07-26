@@ -76,28 +76,6 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' })); // Aumentar limite para upload de fotos
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Health Check endpoint (ANTES das rotas)
-app.get('/health', async (req: Request, res: Response) => {
-  try {
-    // Testa conexão com banco
-    await prisma.$queryRaw`SELECT 1`;
-    res.json({
-      status: 'OK',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      database: 'connected',
-      version: '1.0.0'
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'ERROR',
-      timestamp: new Date().toISOString(),
-      database: 'disconnected',
-      error: 'Database connection failed'
-    });
-  }
-});
-
 // Test Route (ANTES das rotas)
 app.get('/', (req: Request, res: Response) => {
   res.send('API is running!');
